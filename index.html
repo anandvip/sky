@@ -415,6 +415,88 @@
     border-bottom: 1px dotted var(--terracotta);
   }
 
+  /* WATCH THE ORIGINAL */
+  .watch-original {
+    margin: 4.5rem 0 2rem;
+    padding: 2.8rem 2rem;
+    background: var(--bg-deep);
+    border-left: 3px solid var(--terracotta);
+    border-right: 3px solid var(--gold);
+    text-align: center;
+    position: relative;
+  }
+
+  .watch-original::before {
+    content: '▶';
+    display: block;
+    font-size: 1.3rem;
+    color: var(--terracotta);
+    margin-bottom: 0.9rem;
+    letter-spacing: 0.3em;
+    opacity: 0.85;
+  }
+
+  .watch-label {
+    font-family: 'Fraunces', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 0.9rem;
+    font-weight: 500;
+  }
+
+  .watch-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-style: italic;
+    font-size: clamp(1.5rem, 4vw, 1.9rem);
+    color: var(--night);
+    margin-bottom: 0.9rem;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .watch-desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    margin: 0 auto 1.8rem;
+    max-width: 480px;
+    line-height: 1.5;
+  }
+
+  .watch-link {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--ink);
+    padding: 0.9rem 1.9rem;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.35s ease, transform 0.35s ease;
+    font-weight: 500;
+  }
+
+  .watch-link:hover {
+    background: var(--terracotta);
+    transform: translateY(-2px);
+  }
+
+  .watch-link .arrow {
+    margin-left: 0.5rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .watch-link:hover .arrow {
+    transform: translateX(4px);
+  }
+
   footer.colophon {
     text-align: center;
     padding: 3rem 1.5rem 4rem;
@@ -460,6 +542,7 @@
 
     .pullquote { font-size: 1.4rem; }
     .opening p:first-child::first-letter { font-size: 4rem; }
+    .watch-original { padding: 2rem 1.2rem; margin: 3rem 0 1.5rem; }
   }
 
   /* Subtle entrance for sections */
@@ -688,6 +771,15 @@
         I bow down to the equinox, because I am made of the equinox.
         <cite>— Sadhguru</cite>
       </div>
+
+      <aside class="watch-original">
+        <div class="watch-label">From the Source</div>
+        <h3 class="watch-title">Sadhguru is spilling beans</h3>
+        <p class="watch-desc">The 360 series — long-form, unhurried, and dense with the kind of insight that doesn't fit into reels. Worth your hours.</p>
+        <a href="https://www.youtube.com/@sadhguru" class="watch-link" target="_blank" rel="noopener">
+          Visit the channel <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </aside>
 
       <div class="source">
         Reflections on Sadhguru's 360 episode on the Hindu calendar and the equinox passage. Quotes paraphrased from the talk; framing and personal reflection my own. Errors, mine. Insight, his.
