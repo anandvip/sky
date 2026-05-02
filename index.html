@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Calendar That Watches the Sky — Inner Space Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4ECDC;
+    --bg-deep: #EAE0CC;
+    --ink: #1A2A3A;
+    --ink-soft: #3A4A5A;
+    --terracotta: #C4602A;
+    --gold: #B89230;
+    --sage: #5C6B58;
+    --night: #0F1B2C;
+    --rule: #C9B996;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at top, rgba(184, 146, 48, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(196, 96, 42, 0.05) 0%, transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.16 0 0 0 0 0.22 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .container--wide {
+    max-width: 920px;
+  }
+
+  /* HEADER */
+  header.masthead {
+    padding: 3rem 1.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 4rem;
+  }
+
+  .series-tag {
+    font-family: 'Fraunces', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .series-tag::before, .series-tag::after {
+    content: '✦';
+    margin: 0 0.8rem;
+    color: var(--gold);
+  }
+
+  .site-name {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 2rem 0 4rem;
+    position: relative;
+    animation: fadeUp 1.2s ease-out;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-size: clamp(2.5rem, 7vw, 4.8rem);
+    line-height: 1.05;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: var(--night);
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--terracotta);
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+  }
+
+  .hero .subtitle {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 300;
+    max-width: 540px;
+    margin: 0 auto 2rem;
+    line-height: 1.5;
+  }
+
+  .dateline {
+    font-family: 'Fraunces', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage);
+  }
+
+  .dateline span { margin: 0 0.6rem; color: var(--gold); }
+
+  /* DECORATIVE STAR DIVIDER */
+  .divider {
+    text-align: center;
+    margin: 3.5rem 0;
+    color: var(--gold);
+    font-size: 0.9rem;
+    letter-spacing: 1.5em;
+  }
+
+  /* OPENING / DROP CAP */
+  .opening {
+    margin-bottom: 3rem;
+  }
+
+  .opening p:first-child::first-letter {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "WONK" 1;
+    font-size: 5.2rem;
+    float: left;
+    line-height: 0.85;
+    margin: 0.3rem 0.7rem 0 0;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  p { margin-bottom: 1.25rem; }
+
+  p em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem;
+    line-height: 1.55;
+    font-weight: 300;
+    color: var(--ink);
+    font-style: italic;
+    border-left: 2px solid var(--terracotta);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  /* SECTION HEADINGS */
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.15;
+    font-weight: 400;
+    margin: 3.5rem 0 0.5rem;
+    color: var(--night);
+    letter-spacing: -0.01em;
+  }
+
+  h2 .roman {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--terracotta);
+    font-style: normal;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+    color: var(--night);
+  }
+
+  /* PULL QUOTE */
+  .pullquote {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+    line-height: 1.25;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--night);
+    text-align: center;
+    margin: 4rem auto;
+    max-width: 640px;
+    padding: 2rem 1rem;
+    position: relative;
+  }
+
+  .pullquote::before {
+    content: '"';
+    font-size: 6rem;
+    color: var(--terracotta);
+    position: absolute;
+    top: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Fraunces', serif;
+    line-height: 1;
+    opacity: 0.3;
+  }
+
+  .pullquote cite {
+    display: block;
+    font-size: 0.85rem;
+    font-style: normal;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-top: 1.5rem;
+  }
+
+  /* THE 108 VISUAL */
+  .ratio-visual {
+    margin: 4rem auto;
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .ratio-visual svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .ratio-caption {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin-top: 1.5rem;
+  }
+
+  /* THE METHOD CARDS */
+  .methods {
+    margin: 4rem 0;
+  }
+
+  .method {
+    border-top: 1px solid var(--rule);
+    padding: 2.5rem 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .method:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .method-number {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--terracotta);
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .method-body h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+  }
+
+  .method-when {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage);
+    background: var(--bg-deep);
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+  }
+
+  .method-why {
+    margin-top: 0.8rem;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--gold);
+    padding-left: 1rem;
+    font-style: italic;
+  }
+
+  /* TWO HALVES TABLE */
+  .halves {
+    margin: 3rem 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding: 2rem 0;
+  }
+
+  .halves-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .half {
+    padding: 1rem 1.5rem;
+  }
+
+  .half:first-child {
+    border-right: 1px solid var(--rule);
+  }
+
+  .half-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--terracotta);
+    margin-bottom: 0.3rem;
+  }
+
+  .half-period {
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 1rem;
+  }
+
+  .half p {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* CALLOUT */
+  .callout {
+    background: var(--bg-deep);
+    border-left: 3px solid var(--terracotta);
+    padding: 1.5rem 1.8rem;
+    margin: 2.5rem 0;
+    font-size: 0.97rem;
+  }
+
+  .callout-label {
+    font-family: 'Fraunces', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  /* CLOSING / SOURCE */
+  .source {
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    text-align: center;
+  }
+
+  .source a {
+    color: var(--terracotta);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--terracotta);
+  }
+
+  footer.colophon {
+    text-align: center;
+    padding: 3rem 1.5rem 4rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'Fraunces', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--sage);
+  }
+
+  footer .glyph {
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    body { font-size: 17px; }
+
+    .method {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 2rem 0;
+    }
+
+    .method-number {
+      font-size: 2.8rem;
+    }
+
+    .halves-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .half:first-child {
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pullquote { font-size: 1.4rem; }
+    .opening p:first-child::first-letter { font-size: 4rem; }
+  }
+
+  /* Subtle entrance for sections */
+  section {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+  }
+
+  section.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="series-tag">Inner Space Series</div>
+  <div class="site-name">vipulanand.in</div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+      <h1>A Calendar That<br>Watches the <em>Sky</em></h1>
+      <p class="subtitle">On the Panchāṅgam, the equinox passage, and five quiet practices for a body that knows the cosmos.</p>
+      <div class="dateline">Pehowa<span>·</span>Spring<span>·</span>Reflections on Sadhguru's 360</div>
+    </div>
+
+    <div class="divider">✦ ✦ ✦</div>
+
+    <!-- OPENING -->
+    <section class="opening">
+      <p>Most of us, when we say <em>time</em>, look at the wrist or the phone. The clock has become so close to us that we forget what it was originally measuring. A calendar, in our age, has been quietly reduced to a grid for invoices and EMI dates — useful, but small.</p>
+
+      <p>The word <em>calendar</em> itself comes from the Latin <em>calendae</em> — the day debts fell due in the Roman empire. It was, from its origin, a tool of the marketplace. We inherited that grid, and over centuries it has overwritten older instruments that watched the sky instead of the ledger.</p>
+
+      <div class="lead">Sadhguru's recent 360 talk returns to a simple proposition — that this body, this small piece of the planet, is in continuous conversation with the sun, the moon, and the larger geometry of the solar system. A real calendar should help you hear that conversation.</div>
+
+      <p>I want to walk through what struck me most in the talk: the structure of the Hindu lunisolar calendar, the equinox passage, and the five practical methods he prescribes — most of which I had heard from elders without ever knowing why.</p>
+    </section>
+
+    <!-- THE 108 VISUAL -->
+    <div class="ratio-visual">
+      <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three astronomical ratios all approximating 108">
+        <defs>
+          <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#E89A3F"/>
+            <stop offset="100%" stop-color="#C4602A"/>
+          </radialGradient>
+          <radialGradient id="earthGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#5C7B5A"/>
+            <stop offset="100%" stop-color="#2E4530"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Group 1: Sun diameter = 108 × Earth diameter -->
+        <g transform="translate(100, 120)">
+          <circle r="55" fill="url(#sunGrad)" opacity="0.85"/>
+          <circle r="2.5" cx="0" cy="0" fill="url(#earthGrad)" stroke="#1A2A3A" stroke-width="0.5"/>
+          <text x="0" y="95" text-anchor="middle" font-family="Fraunces" font-size="11" fill="#3A4A5A" font-style="italic">Sun ≈ 108 × Earth</text>
+        </g>
+
+        <!-- Center divider -->
+        <line x1="200" y1="60" x2="200" y2="180" stroke="#C9B996" stroke-width="1"/>
+
+        <!-- Group 2: 108 dots in a ring -->
+        <g transform="translate(300, 120)">
+          <g id="dots">
+            <!-- Generated programmatically below; placeholder ring -->
+          </g>
+          <text x="0" y="6" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="22" fill="#C4602A" font-weight="500">108</text>
+          <text x="0" y="95" text-anchor="middle" font-family="Fraunces" font-size="11" fill="#3A4A5A" font-style="italic">the recurring ratio</text>
+        </g>
+
+        <!-- Center divider -->
+        <line x1="400" y1="60" x2="400" y2="180" stroke="#C9B996" stroke-width="1"/>
+
+        <!-- Group 3: Earth-Sun distance = 108 × Sun diameter -->
+        <g transform="translate(500, 120)">
+          <circle r="6" fill="url(#sunGrad)"/>
+          <circle r="55" fill="none" stroke="#B89230" stroke-width="0.6" stroke-dasharray="2 3"/>
+          <circle r="2" cx="55" cy="0" fill="url(#earthGrad)"/>
+          <text x="0" y="95" text-anchor="middle" font-family="Fraunces" font-size="11" fill="#3A4A5A" font-style="italic">Earth–Sun ≈ 108 × Sun</text>
+        </g>
+      </svg>
+      <p class="ratio-caption">The same number — 108 — recurs across three independent astronomical ratios, the count of working chakras in the human system, and the beads of a mālā.</p>
+    </div>
+
+    <!-- THE PANCHANGAM -->
+    <section>
+      <h2><span class="roman">I.</span>What a Calendar Could Hold</h2>
+
+      <p>The Panchāṅgam — the <em>five-limbed</em> calendar — was designed not by tax collectors but by mystics. They were not interested in when debts fell due. They were interested in when the body would be most receptive, when the mind would settle, when the field around us would tilt.</p>
+
+      <p>The five limbs are these:</p>
+
+      <p><strong>Tithi</strong> — the lunar day, mapping the phase of the moon.<br>
+      <strong>Vāra</strong> — the weekday, linked to seven celestial bodies.<br>
+      <strong>Nakṣhatra</strong> — the lunar mansion among 27 star-constellations the moon currently occupies.<br>
+      <strong>Yoga</strong> — the angular relationship between sun and moon.<br>
+      <strong>Karaṇa</strong> — the fine-grained windows for action.</p>
+
+      <p>The Gregorian calendar, by contrast, tracks none of these. It numbers days. That is its entire job. It was, as Sadhguru reminds us, made by the marketplace and for the marketplace.</p>
+
+      <div class="callout">
+        <div class="callout-label">A small note</div>
+        It is estimated the first Hindu calendar was made eight to twelve thousand years ago — and has not needed correction since. Because it is not a calculation. It is an observation.
+      </div>
+    </section>
+
+    <!-- THE TWO HALVES -->
+    <section>
+      <h2><span class="roman">II.</span>The Two Halves of the Year</h2>
+
+      <p>The year, in this view, divides cleanly in two — a northern run and a southern run, each with its own quality.</p>
+
+      <div class="halves">
+        <div class="halves-grid">
+          <div class="half">
+            <div class="half-name">Uttarāyaṇa</div>
+            <div class="half-period">Dec 21 — Jun 21 · Northern Run</div>
+            <p>The sun moves a little further north each day. Time of harvest — both in the field and within. <em>Kaivalya</em>: receiving, ripening.</p>
+            <p>Studies have noted increased neuronal growth and connectivity through this half. The body expands.</p>
+          </div>
+          <div class="half">
+            <div class="half-name">Dakṣhiṇāyana</div>
+            <div class="half-period">Jun 21 — Dec 21 · Southern Run</div>
+            <p>The sun begins its southern run. Time of preparation, of work upon oneself. <em>Sādhanā</em>: cleansing, restructuring.</p>
+            <p>The brain shifts toward a pruning or cleanup phase. The body consolidates.</p>
+          </div>
+        </div>
+      </div>
+
+      <p>This is not metaphor. The metabolic system, the glands, the immune mechanism — each behaves differently across these two halves. The festivals of the subcontinent are calibrated to this rhythm.</p>
+    </section>
+
+    <!-- THE EQUINOX -->
+    <section>
+      <h2><span class="roman">III.</span>The Equinox Passage</h2>
+
+      <p>Twice a year — around 20 March and 22 September — the planet's magnetic envelope, which usually deflects the high-energy plasma streaming from the sun, weakens. The effect is strongest between 23° and 33° latitude — a band that holds most of India, parts of southern Europe, China, and the United States.</p>
+
+      <p>This is not abstract. Every function of the body is, at its base, electrical. The heartbeat, the firing of a thought — these are movements of charged ions: sodium, potassium, calcium, magnesium. When the field around you fluctuates, your body — being a subtle antenna — picks up the change.</p>
+
+      <p class="pullquote">A disturbance is a disturbance only if you haven't prepared yourself for it.<cite>— Sadhguru</cite></p>
+
+      <p>The image he uses is the hang-glider. A hang-glider takes off <em>into</em> the wind, never with it. The same wind that lifts a properly oriented glider crashes a poorly oriented one. The cosmos is not for or against us. It moves the way it moves. The work is on us.</p>
+
+      <p>For an unprepared system, equinox windows show up as migraines, brain fog, irritability, low mood, that sense of being slightly off oneself. For a system that has done some work — through sādhanā, through stillness, through the simple practices below — the same charge becomes lift.</p>
+    </section>
+
+    <!-- THE FIVE METHODS -->
+    <section class="methods">
+      <h2><span class="roman">IV.</span>Five Quiet Practices</h2>
+
+      <p>Most of these I had seen done by elders without explanation. Putting the <em>why</em> next to the <em>what</em> changes the practice from folklore into instrument.</p>
+
+      <div class="method">
+        <div class="method-number">01</div>
+        <div class="method-body">
+          <span class="method-when">April → June · Outdoor work</span>
+          <h3>Castor oil on the crown of the head</h3>
+          <p>From Chaitra Pūrṇimā (the full moon in April) until the summer solstice, the sun is at peak intensity. South Indian farmers and outdoor workers traditionally applied castor oil — thick, slow-evaporating — on the top of the head before stepping out.</p>
+          <p class="method-why">Water cools the crown for ten minutes. Oil holds the moisture all day. The crown is the most receptive point during peak sun.</p>
+        </div>
+      </div>
+
+      <div class="method">
+        <div class="method-number">02</div>
+        <div class="method-body">
+          <span class="method-when">Sunrise · Noon · Sunset · Midnight</span>
+          <h3>Wet hair at the sandhyā windows</h3>
+          <p>Four moments each day are transitions. During equinoxes, full moons, and new moons, keep the hair wet — or at least the top of the head — through these windows.</p>
+          <p class="method-why">The crown is most porous to environmental shifts at transitions. A wet head regulates the over-stimulation.</p>
+        </div>
+      </div>
+
+      <div class="method">
+        <div class="method-number">03</div>
+        <div class="method-body">
+          <span class="method-when">Mārgazhi · Dec 16 — mid-Jan</span>
+          <h3>The pre-sunrise cold dip, for one maṇḍala</h3>
+          <p>Before sunrise, ideally during Brahma Muhūrtam, take a cold-water bath. Continue for forty to forty-eight days — one full <em>maṇḍala</em>.</p>
+          <p class="method-why">Cold contracts surface blood vessels; activity widens them again. Repeated narrowing-and-widening trains vascular flexibility — measurable improvement in cardiovascular resilience. One day shocks the body. Forty remodels it.</p>
+        </div>
+      </div>
+
+      <div class="method">
+        <div class="method-number">04</div>
+        <div class="method-body">
+          <span class="method-when">April → June · Daily food</span>
+          <h3>Seasonal cooling preparations</h3>
+          <p>Lakshmi Charu in Andhra. Puliyodharai or Pulisadam in Tamil Nadu. Gojju in Karnataka. Tamarind-based, fermented, B12-rich — the body's monsoon for itself.</p>
+          <p class="method-why">These are not comfort food. They are seasonal medicine, calibrated to the months when the sun is strongest. What you ingest is as decisive as how you breathe.</p>
+        </div>
+      </div>
+
+      <div class="method">
+        <div class="method-number">05</div>
+        <div class="method-body">
+          <span class="method-when">Pūrṇimā · Amāvasya · monthly</span>
+          <h3>Honour the full moon and the new moon</h3>
+          <p>Traditionally, Pūrṇimā was a three-day rest (the day before, the day of, the day after); Amāvasya, two. The rhythm that brought every one of us into a body in the first place was lunar.</p>
+          <p class="method-why">If full rest is not possible, the minimum: slow down, sleep more, watch what arises in the mind.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING -->
+    <section>
+      <h2><span class="roman">V.</span>The Closing Note</h2>
+
+      <p>There is a couplet from the Kannada mystic Devara Dāsimayya that Sadhguru reads near the end of the talk. To the one who is absolutely with Śiva, he says, there is no dawn, no new moon, no day, no equinox, no sunset, no full moon. His front yard is Vārāṇasī itself.</p>
+
+      <p>For the one in full union with <em>kāla</em>, the inner experience is no longer determined by celestial moments. The cosmos still moves; he is no longer moved by it. That is the goal of yoga — to put the human being in charge of his own experience.</p>
+
+      <p>But until that liberation, we are still here, in a body, on a planet that tilts and wheels through space. Until then, we ride the cycles. To ride them well, we need a calendar that watches the sky.</p>
+
+      <p>The Panchāṅgam, it turns out, is not a relic. It is an instrument.</p>
+
+      <div class="pullquote" style="margin-top:3.5rem;">
+        I bow down to the equinox, because I am made of the equinox.
+        <cite>— Sadhguru</cite>
+      </div>
+
+      <div class="source">
+        Reflections on Sadhguru's 360 episode on the Hindu calendar and the equinox passage. Quotes paraphrased from the talk; framing and personal reflection my own. Errors, mine. Insight, his.
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="colophon">
+  <div class="glyph">✦ ✦ ✦</div>
+  Inner Space Series · vipulanand.in
+</footer>
+
+<script>
+  // Generate the 108 dot ring inside the SVG
+  (function generateDots() {
+    const dotsGroup = document.getElementById('dots');
+    if (!dotsGroup) return;
+    const radius = 45;
+    const count = 108;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', x.toFixed(2));
+      dot.setAttribute('cy', y.toFixed(2));
+      dot.setAttribute('r', '1.6');
+      dot.setAttribute('fill', '#B89230');
+      dot.setAttribute('opacity', '0.75');
+      dotsGroup.appendChild(dot);
+    }
+  })();
+
+  // Subtle scroll-reveal for sections
+  const sections = document.querySelectorAll('section');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+
+  sections.forEach((s) => obs.observe(s));
+</script>
+
+</body>
+</html>
